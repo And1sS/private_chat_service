@@ -1,3 +1,16 @@
 package com.and1ss.private_chat_service.exceptions;
 
-public class InternalServerException extends RuntimeException {}
+public class InternalServerException extends RuntimeException {
+    private String msg = "";
+
+    public InternalServerException() {}
+
+    public InternalServerException(String msg) {
+        this.msg = msg;
+    }
+
+    @Override
+    public String getMessage() {
+        return msg;
+    }
+}
