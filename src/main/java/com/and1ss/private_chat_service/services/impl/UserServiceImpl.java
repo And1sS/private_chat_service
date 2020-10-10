@@ -2,7 +2,7 @@ package com.and1ss.private_chat_service.services.impl;
 
 import com.and1ss.private_chat_service.exceptions.BadRequestException;
 import com.and1ss.private_chat_service.exceptions.InternalServerException;
-import com.and1ss.private_chat_service.services.impl.connections.UserServiceConnection;
+import com.and1ss.private_chat_service.api.connections.UserServiceConnection;
 import com.and1ss.private_chat_service.api.dto.AccountInfoRetrievalDTO;
 import com.and1ss.private_chat_service.exceptions.UnauthorizedException;
 import com.and1ss.private_chat_service.model.AccountInfo;

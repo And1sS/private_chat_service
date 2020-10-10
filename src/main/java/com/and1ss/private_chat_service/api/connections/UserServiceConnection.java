@@ -1,9 +1,7 @@
-package com.and1ss.private_chat_service.services.impl.connections;
+package com.and1ss.private_chat_service.api.connections;
 
 import com.and1ss.private_chat_service.api.dto.AccountInfoRetrievalDTO;
-import com.and1ss.private_chat_service.model.AccountInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,8 +16,6 @@ import java.util.UUID;
 @Service
 public class UserServiceConnection {
     private WebClient webClient;
-
-    private Environment env;
 
     private String userServiceBaseAddr;
 
