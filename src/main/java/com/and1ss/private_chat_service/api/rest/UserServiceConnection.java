@@ -1,7 +1,8 @@
-package com.and1ss.private_chat_service.api.connections;
+package com.and1ss.private_chat_service.api.rest;
 
 import com.and1ss.private_chat_service.api.dto.AccountInfoRetrievalDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

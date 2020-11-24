@@ -1,0 +1,54 @@
+syntax = "proto3";
+option java_multiple_files = true;
+
+package com.and1ss.private_chat_service;
+
+message GrpcAccessTokenIncomingDTO {
+  string token = 1;
+}
+
+message GrpcChatRetrievalDTO {
+  string token = 1;
+  string chatId = 2;
+}
+
+message GrpcChatCreationDTO {
+  string token = 1;
+  string userId = 2;
+}
+
+message GrpcPrivateChatDTO {
+  string id = 1;
+  string user1Id = 2;
+  string user2Id = 3;
+}
+
+message GrpcPrivateMessageCreationDTO {
+  string contents = 1;
+  string token = 2;
+  string chatId = 3;
+}
+
+message GrpcPrivateMessageRetrievalDTO {
+  string id = 1;
+  string authorId = 2;
+  string chatId = 3;
+  string contents = 4;
+  string createdAt = 5;
+}
+
+message GrpcPrivateMessagesRetrievalDTO {
+  repeated GrpcPrivateMessageRetrievalDTO messages = 1;
+}
+
+message GrpcPrivateChatsDTO {
+  repeated GrpcPrivateChatDTO chats = 1;
+}
+
+service GrpcGroupChatService {
+  rpc getAllChats(GrpcAccessTokenIncomingDTO) returns (GrpcPrivateChatsDTO);
+  rpc getChatById(GrpcChatRetrievalDTO) returns (GrpcPrivateChatDTO);
+  rpc createPrivateChat(GrpcChatCreationDTO) returns (GrpcPrivateChatDTO);
+  rpc getAllMessagesForChat(GrpcChatRetrievalDTO) returns (GrpcPrivateMessagesRetrievalDTO);
+  rpc createMessage(GrpcPrivateMessageCreationDTO) returns (GrpcPrivateMessageRetrievalDTO);
+}

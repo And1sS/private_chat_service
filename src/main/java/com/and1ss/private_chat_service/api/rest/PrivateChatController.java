@@ -1,4 +1,4 @@
-package com.and1ss.private_chat_service.api;
+package com.and1ss.private_chat_service.api.rest;
 
 import com.and1ss.private_chat_service.api.dto.PrivateChatCreationDTO;
 import com.and1ss.private_chat_service.api.dto.PrivateChatRetrievalDTO;
