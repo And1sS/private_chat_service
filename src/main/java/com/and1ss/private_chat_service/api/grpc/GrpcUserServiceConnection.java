@@ -22,7 +22,7 @@ public class GrpcUserServiceConnection {
     @Autowired
     public GrpcUserServiceConnection() {
         channel = ManagedChannelBuilder
-                .forAddress("localhost", 6565)
+                .forAddress("localhost", 6566)
                 .usePlaintext()
                 .build();
     }

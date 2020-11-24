@@ -9,6 +9,7 @@ import com.and1ss.private_chat_service.model.PrivateMessage;
 import com.and1ss.private_chat_service.services.PrivateChatMessageService;
 import com.and1ss.private_chat_service.services.PrivateChatService;
 import io.grpc.stub.StreamObserver;
+import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@GRpcService
 public class GrpcPrivateChatService extends GrpcPrivateChatServiceGrpc.GrpcPrivateChatServiceImplBase {
     private final GrpcUserServiceConnection grpcUserServiceConnection;
     private final PrivateChatService privateChatService;
