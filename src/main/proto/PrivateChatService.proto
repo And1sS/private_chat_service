@@ -45,7 +45,7 @@ message GrpcPrivateChatsDTO {
   repeated GrpcPrivateChatDTO chats = 1;
 }
 
-service GrpcGroupChatService {
+service GrpcPrivateChatService {
   rpc getAllChats(GrpcAccessTokenIncomingDTO) returns (GrpcPrivateChatsDTO);
   rpc getChatById(GrpcChatRetrievalDTO) returns (GrpcPrivateChatDTO);
   rpc createPrivateChat(GrpcChatCreationDTO) returns (GrpcPrivateChatDTO);

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class GrpcPrivateChatService extends GrpcGroupChatServiceGrpc.GrpcGroupChatServiceImplBase {
+public class GrpcPrivateChatService extends GrpcPrivateChatServiceGrpc.GrpcPrivateChatServiceImplBase {
     private final GrpcUserServiceConnection grpcUserServiceConnection;
     private final PrivateChatService privateChatService;
     private final PrivateChatMessageService privateChatMessageService;
