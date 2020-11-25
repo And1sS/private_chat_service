@@ -8,6 +8,7 @@ import com.and1ss.user_service.GrpcUsersIdsDTO;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +21,9 @@ public class GrpcUserServiceConnection {
     private final ManagedChannel channel;
 
     @Autowired
-    public GrpcUserServiceConnection() {
+    public GrpcUserServiceConnection(Environment env) {
         channel = ManagedChannelBuilder
-                .forAddress("localhost", 6566)
+                .forAddress(env.getProperty("grpc_auth_url"), Integer.valueOf(env.getProperty("grpc_auth_port")))
                 .usePlaintext()
                 .build();
     }
