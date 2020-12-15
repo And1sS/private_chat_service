@@ -1,4 +1,4 @@
-package com.and1ss.private_chat_service.api.dto;
+package com.and1ss.private_chat_service.api.rest.dto;
 
 import com.and1ss.private_chat_service.model.AccountInfo;
 import lombok.*;

@@ -1,9 +1,9 @@
 package com.and1ss.private_chat_service.api.rest;
 
-import com.and1ss.private_chat_service.api.dto.PrivateChatCreationDTO;
-import com.and1ss.private_chat_service.api.dto.PrivateChatRetrievalDTO;
-import com.and1ss.private_chat_service.api.dto.PrivateMessageCreationDTO;
-import com.and1ss.private_chat_service.api.dto.PrivateMessageRetrievalDTO;
+import com.and1ss.private_chat_service.api.rest.dto.PrivateChatCreationDTO;
+import com.and1ss.private_chat_service.api.rest.dto.PrivateChatRetrievalDTO;
+import com.and1ss.private_chat_service.api.rest.dto.PrivateMessageCreationDTO;
+import com.and1ss.private_chat_service.api.rest.dto.PrivateMessageRetrievalDTO;
 import com.and1ss.private_chat_service.exceptions.BadRequestException;
 import com.and1ss.private_chat_service.model.AccountInfo;
 import com.and1ss.private_chat_service.model.PrivateChat;

@@ -1,6 +1,5 @@
 package com.and1ss.private_chat_service.api.grpc;
 
-import com.and1ss.private_chat_service.api.dto.AccountInfoRetrievalDTO;
 import com.and1ss.user_service.GrpcAccessTokenIncomingDTO;
 import com.and1ss.user_service.GrpcAuthenticationServiceGrpc;
 import com.and1ss.user_service.GrpcUserIdDTO;
@@ -10,6 +9,7 @@ import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import com.and1ss.private_chat_service.api.rest.dto.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +23,7 @@ public class GrpcUserServiceConnection {
     @Autowired
     public GrpcUserServiceConnection(Environment env) {
         channel = ManagedChannelBuilder
-                .forAddress(env.getProperty("grpc_auth_url"), Integer.valueOf(env.getProperty("grpc_auth_port")))
+                .forAddress("localhost", 6566)
                 .usePlaintext()
                 .build();
     }
