@@ -8,6 +8,7 @@ import com.and1ss.private_chat_service.model.PrivateMessage;
 import com.and1ss.private_chat_service.services.PrivateChatMessageService;
 import com.and1ss.private_chat_service.services.PrivateChatService;
 import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @GRpcService
 public class GrpcPrivateChatService extends GrpcPrivateChatServiceGrpc.GrpcPrivateChatServiceImplBase {
     private final GrpcUserServiceConnection grpcUserServiceConnection;
@@ -94,68 +96,62 @@ public class GrpcPrivateChatService extends GrpcPrivateChatServiceGrpc.GrpcPriva
     }
 
     @Override
-    @Transactional
     public void createPrivateChat(
             GrpcChatCreationDTO request,
             StreamObserver<GrpcPrivateChatDTO> responseObserver
     ) {
-        final var userDto = grpcUserServiceConnection
-                .authorizeUserByAccessToken(request.getToken());
-        final var authorizedUser = AccountInfo.builder()
-                .id(userDto.getId())
-                .name(userDto.getName())
-                .surname(userDto.getSurname())
-                .build();
+        try {
+            final var userDto = grpcUserServiceConnection
+                    .authorizeUserByAccessToken(request.getToken());
+            final var authorizedUser = AccountInfo.builder()
+                    .id(userDto.getId())
+                    .name(userDto.getName())
+                    .surname(userDto.getSurname())
+                    .build();
 
-        final var user2Id = UUID.fromString(request.getUserId());
-        final var user2Dto = grpcUserServiceConnection.getUserById(user2Id);
+            final var user2Id = UUID.fromString(request.getUserId());
+            final var user2Dto = grpcUserServiceConnection.getUserById(user2Id);
 
-        final var user2 = AccountInfo.builder()
-                .id(user2Dto.getId())
-                .name(user2Dto.getName())
-                .surname(user2Dto.getSurname())
-                .build();
+            final var user2 = AccountInfo.builder()
+                    .id(user2Dto.getId())
+                    .name(user2Dto.getName())
+                    .surname(user2Dto.getSurname())
+                    .build();
 
-        if (user2.equals(authorizedUser)) {
-            throw new BadRequestException("User can not create private chats with himself");
+            if (user2.equals(authorizedUser)) {
+                throw new BadRequestException("User can not create private chats with himself");
+            }
+
+            PrivateChat toBeCreated = PrivateChat.builder()
+                    .user1Id(authorizedUser.getId())
+                    .user2Id(user2.getId())
+                    .build();
+
+
+            log.info("Trying to create private chat: " + authorizedUser.getName() + "-" + user2.getName());
+            PrivateChat createdChat = privateChatService
+                    .createPrivateChat(toBeCreated, authorizedUser);
+
+            final var grpcDto = GrpcPrivateChatDTO.newBuilder()
+                    .setId(createdChat.getId().toString())
+                    .setUser1Id(createdChat.getUser1Id().toString())
+                    .setUser2Id(createdChat.getUser2Id().toString())
+                    .build();
+
+            responseObserver.onNext(grpcDto);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
         }
-
-        PrivateChat toBeCreated = PrivateChat.builder()
-                .user1Id(authorizedUser.getId())
-                .user2Id(user2.getId())
-                .build();
-
-        PrivateChat createdChat = privateChatService
-                .createPrivateChat(toBeCreated, authorizedUser);
-
-        final var grpcDto = GrpcPrivateChatDTO.newBuilder()
-                .setId(createdChat.getId().toString())
-                .setUser1Id(createdChat.getUser1Id().toString())
-                .setUser2Id(createdChat.getUser2Id().toString())
-                .build();
-
-        responseObserver.onNext(grpcDto);
-        responseObserver.onCompleted();
     }
 
     @Override
-    @Transactional
     public void getAllMessagesForChat(
             GrpcChatRetrievalDTO request,
             StreamObserver<GrpcPrivateMessagesRetrievalDTO> responseObserver
     ) {
-        final var userDto = grpcUserServiceConnection
-                .authorizeUserByAccessToken(request.getToken());
-        final var authorizedUser = AccountInfo.builder()
-                .id(userDto.getId())
-                .name(userDto.getName())
-                .surname(userDto.getSurname())
-                .build();
 
-        final var chatId = UUID.fromString(request.getChatId());
-        PrivateChat privateChat = privateChatService.getPrivateChatById(chatId, authorizedUser);
-
-        final var messages = privateChatMessageService.getAllMessages(privateChat, authorizedUser);
+        final var messages = getAllMessagesForChat(request);
 
         final var messagesDto = messages.stream()
                 .map(message -> GrpcPrivateMessageRetrievalDTO.newBuilder()
@@ -175,11 +171,8 @@ public class GrpcPrivateChatService extends GrpcPrivateChatServiceGrpc.GrpcPriva
         responseObserver.onCompleted();
     }
 
-    @Override
-    public void createMessage(
-            GrpcPrivateMessageCreationDTO request,
-            StreamObserver<GrpcPrivateMessageRetrievalDTO> responseObserver
-    ) {
+    @Transactional
+    public List<PrivateMessage> getAllMessagesForChat(GrpcChatRetrievalDTO request) {
         final var userDto = grpcUserServiceConnection
                 .authorizeUserByAccessToken(request.getToken());
         final var authorizedUser = AccountInfo.builder()
@@ -191,24 +184,47 @@ public class GrpcPrivateChatService extends GrpcPrivateChatServiceGrpc.GrpcPriva
         final var chatId = UUID.fromString(request.getChatId());
         PrivateChat privateChat = privateChatService.getPrivateChatById(chatId, authorizedUser);
 
-        final var messageToCreate = PrivateMessage.builder()
-                .authorId(authorizedUser.getId())
-                .chatId(chatId)
-                .contents(request.getContents())
-                .build();
+        return privateChatMessageService.getAllMessages(privateChat, authorizedUser);
+    }
 
-        final var createdMessage = privateChatMessageService
-                .addMessage(privateChat, messageToCreate, authorizedUser);
+    @Override
+    public void createMessage(
+            GrpcPrivateMessageCreationDTO request,
+            StreamObserver<GrpcPrivateMessageRetrievalDTO> responseObserver
+    ) {
+        try {
+            final var userDto = grpcUserServiceConnection
+                    .authorizeUserByAccessToken(request.getToken());
+            final var authorizedUser = AccountInfo.builder()
+                    .id(userDto.getId())
+                    .name(userDto.getName())
+                    .surname(userDto.getSurname())
+                    .build();
 
-        final var grpcDto = GrpcPrivateMessageRetrievalDTO.newBuilder()
-                .setId(createdMessage.getId().toString())
-                .setAuthorId(createdMessage.getAuthorId().toString())
-                .setChatId(createdMessage.getChatId().toString())
-                .setContents(createdMessage.getContents())
-                .setCreatedAt(createdMessage.getCreatedAt().toString())
-                .build();
+            final var chatId = UUID.fromString(request.getChatId());
+            PrivateChat privateChat = privateChatService.getPrivateChatById(chatId, authorizedUser);
 
-        responseObserver.onNext(grpcDto);
-        responseObserver.onCompleted();
+            final var messageToCreate = PrivateMessage.builder()
+                    .authorId(authorizedUser.getId())
+                    .chatId(chatId)
+                    .contents(request.getContents())
+                    .build();
+
+            final var createdMessage = privateChatMessageService
+                    .addMessage(privateChat, messageToCreate, authorizedUser);
+
+            final var grpcDto = GrpcPrivateMessageRetrievalDTO.newBuilder()
+                    .setId(createdMessage.getId().toString())
+                    .setAuthorId(createdMessage.getAuthorId().toString())
+                    .setChatId(createdMessage.getChatId().toString())
+                    .setContents(createdMessage.getContents())
+                    .setCreatedAt(createdMessage.getCreatedAt().toString())
+                    .build();
+
+            responseObserver.onNext(grpcDto);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
     }
 }
