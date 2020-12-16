@@ -54,7 +54,7 @@ public class MyMqttCallback implements MqttCallback {
                     handleNewMessageCreation(message);
                     break;
 
-                case "/private-chat-service/new-chat-creation":
+                case "/private-chat-service/new-chat":
                     handleNewChatCreation(message);
                     break;
 
